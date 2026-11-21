@@ -1,0 +1,419 @@
+
+/* =========================================
+   GIDY CONNECT — PREMIUM DESIGN SYSTEM
+   Version 1.0
+========================================= */
+
+:root {
+  --bg: #090b16;
+  --surface: #111528;
+  --surface-light: #191e35;
+  --primary: #8178ff;
+  --cyan: #54e5ed;
+  --text: #f5f6ff;
+  --muted: #969bb4;
+  --border: rgba(154, 145, 255, 0.17);
+  --gradient: linear-gradient(135deg, #8178ff, #43dbe9);
+  --shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  --radius: 20px;
+}
+
+/* RESET */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  line-height: 1.6;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 4px;
+}
+
+/* APPLICATION */
+
+#app {
+  width: 100%;
+  max-width: 1200px;
+  min-height: 100vh;
+  margin: auto;
+  padding-bottom: 105px;
+}
+
+/* HEADER */
+
+.app-header {
+  height: 76px;
+  padding: 0 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: rgba(9, 11, 22, 0.92);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(18px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.brand-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--gradient);
+  color: #080b16;
+  font-size: 23px;
+  font-weight: 900;
+  box-shadow: 0 0 22px rgba(104, 128, 255, 0.3);
+}
+
+.profile-button {
+  width: 43px;
+  height: 43px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface-light);
+  font-weight: 800;
+  color: var(--cyan);
+}
+
+/* MAIN CONTENT */
+
+main {
+  padding: 0 5%;
+}
+
+.welcome-section {
+  padding: 65px 0 45px;
+}
+
+.eyebrow {
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  margin-bottom: 15px;
+}
+
+.welcome-section h1 {
+  font-size: clamp(32px, 6vw, 55px);
+  line-height: 1.14;
+  letter-spacing: -2px;
+  font-weight: 850;
+  background: linear-gradient(
+    110deg,
+    #ffffff,
+    #a8a1ff,
+    #54e5ed
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.welcome-description {
+  max-width: 540px;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+/* DASHBOARD */
+
+.dashboard-section {
+  margin-top: 10px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 24px;
+}
+
+.section-heading h2,
+.profile-section h2 {
+  font-size: 21px;
+  font-weight: 750;
+}
+
+.section-heading p,
+.profile-section p {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.connection-count {
+  padding: 7px 12px;
+  background: rgba(84, 229, 237, 0.08);
+  color: var(--cyan);
+  border: 1px solid rgba(84, 229, 237, 0.2);
+  border-radius: 30px;
+  font-size: 11px;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+/* SOCIAL GRID */
+
+.social-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.social-card {
+  min-width: 0;
+  min-height: 155px;
+  padding: 20px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: linear-gradient(
+    145deg,
+    #171a32,
+    #111326
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 9px;
+  transition: transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.social-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary);
+  box-shadow: 0 12px 30px rgba(104, 112, 255, 0.13);
+}
+
+.social-icon {
+  width: 55px;
+  height: 55px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--primary);
+  border-radius: 18px;
+  background: rgba(129, 120, 255, 0.1);
+  color: var(--cyan);
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.social-card h3 {
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.social-card p {
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+/* CONNECT BUTTON */
+
+.add-account-button {
+  width: 100%;
+  min-height: 54px;
+  margin-top: 22px;
+  border: 0;
+  border-radius: 15px;
+  background: var(--gradient);
+  color: #080b16;
+  font-weight: 800;
+  font-size: 14px;
+  box-shadow: 0 8px 24px rgba(91, 130, 255, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.add-account-button:hover {
+  transform: translateY(-2px);
+}
+
+/* PROFILE SECTION */
+
+.profile-section {
+  margin-top: 38px;
+  padding: 25px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: linear-gradient(
+    135deg,
+    rgba(129, 120, 255, 0.13),
+    rgba(84, 229, 237, 0.04)
+  );
+}
+
+.profile-section p {
+  max-width: 500px;
+  margin-bottom: 18px;
+}
+
+.secondary-button {
+  padding: 11px 18px;
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  background: rgba(129, 120, 255, 0.12);
+  color: white;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* BOTTOM NAVIGATION */
+
+.bottom-navigation {
+  position: fixed;
+  z-index: 200;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1200px;
+  min-height: 76px;
+  padding: 9px 3%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: rgba(13, 16, 32, 0.96);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+}
+
+.nav-item {
+  min-width: 55px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+
+.nav-item span {
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.nav-item small {
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.nav-item.active {
+  color: var(--cyan);
+}
+
+/* TABLETS */
+
+@media (min-width: 700px) {
+  main {
+    padding-left: 7%;
+    padding-right: 7%;
+  }
+
+  .welcome-section {
+    padding-top: 85px;
+  }
+
+  .social-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .social-card {
+    min-height: 180px;
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 480px) {
+  .app-header {
+    height: 68px;
+  }
+
+  .welcome-section {
+    padding-top: 48px;
+  }
+
+  .welcome-section h1 {
+    letter-spacing: -1.2px;
+  }
+
+  .social-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .social-card {
+    min-height: 145px;
+    padding: 16px 8px;
+  }
+
+  .section-heading h2 {
+    font-size: 18px;
+  }
+
+  .connection-count {
+    font-size: 10px;
+  }
+
+  .profile-section {
+    padding: 20px;
+  }
+}
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
