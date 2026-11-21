@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090b16">
+  <meta name="description" content="Gidy Connect - One Identity. All Your Connections.">
+  <title>Gidy Connect</title>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="app">
+
+    <header class="app-header">
+      <a href="#" class="brand">
+        <span class="brand-icon">G</span>
+        <span>Gidy Connect</span>
+      </a>
+
+      <button class="profile-button" aria-label="Profile">
+        <span>G</span>
+      </button>
+    </header>
+
+    <main id="main-content">
+
+      <section class="welcome-section">
+        <p class="eyebrow">YOUR DIGITAL WORLD</p>
+        <h1>One Identity.<br>All Your Connections.</h1>
+        <p class="welcome-description">
+          Bring your social world together in one place.
+          Connect, organize and manage your digital identity.
+        </p>
+      </section>
+
+      <section class="dashboard-section">
+        <div class="section-heading">
+          <div>
+            <h2>Your Connections</h2>
+            <p>All your social platforms in one place.</p>
+          </div>
+          <span class="connection-count">0 Connected</span>
+        </div>
+
+        <div id="social-platforms" class="social-grid">
+          <!-- Social platform cards will be added here -->
+        </div>
+
+        <button id="add-account" class="add-account-button">
+          + Connect a Social Account
+        </button>
+      </section>
+
+      <section class="profile-section">
+        <h2>Your Digital Identity</h2>
+        <p>Create your personal profile and share
+          all your social connections through one link.
+        </p>
+        <button id="create-profile" class="secondary-button">
+          Create Your Profile
+        </button>
+      </section>
+
+    </main>
+
+    <nav class="bottom-navigation" aria-label="Main navigation">
+      <button class="nav-item active" data-page="home">
+        <span>⌂</span>
+        <small>Home</small>
+      </button>
+
+      <button class="nav-item" data-page="connections">
+        <span>◎</span>
+        <small>Connect</small>
+      </button>
+
+      <button class="nav-item" data-page="inbox">
+        <span>✉</span>
+        <small>Inbox</small>
+      </button>
+
+      <button class="nav-item" data-page="notifications">
+        <span>♧</span>
+        <small>Activity</small>
+      </button>
+
+      <button class="nav-item" data-page="profile">
+        <span>♙</span>
+        <small>Profile</small>
+      </button>
+    </nav>
+
+  </div>
+
+  <script src="js/app.js"></script>
+
+</body>
+</html>
