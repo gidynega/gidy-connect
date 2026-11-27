@@ -1,9 +1,12 @@
 
 /* =========================================
    GIDY CONNECT — EMAIL AUTHENTICATION
+   Complete improved version
 ========================================= */
 
 (() => {
+  "use strict";
+
   const supabase = window.gidySupabase;
 
   if (!supabase) {
@@ -12,6 +15,11 @@
   }
 
   const profileButton = document.querySelector(".profile-button");
+
+  if (!profileButton) {
+    console.error("Profile button not found.");
+    return;
+  }
 
   const style = document.createElement("style");
 
@@ -35,6 +43,7 @@
       border-radius: 18px;
       border: 1px solid #303957;
       font-family: inherit;
+      box-sizing: border-box;
     }
 
     .gidy-auth-box h2 {
@@ -61,6 +70,11 @@
       margin-top: 10px;
     }
 
+    .gidy-auth-box button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
     .gidy-auth-submit {
       width: 100%;
       background: #65eee4;
@@ -84,6 +98,11 @@
       font-size: 13px;
       overflow-wrap: anywhere;
       color: #65eee4;
+      min-height: 18px;
+    }
+
+    .gidy-auth-message.error {
+      color: #ff7777;
     }
   `;
 
@@ -93,7 +112,10 @@
   let overlay = null;
 
   async function getSession() {
-    const { data } = await supabase.auth.getSession();
+    const { data, error } = await supabase.auth.getSession();
+
+    if (error) throw error;
+
     return data.session;
   }
 
@@ -106,7 +128,11 @@
     overlay.innerHTML = `
       <div class="gidy-auth-box">
 
-        <button class="gidy-auth-close">×</button>
+        <button
+          class="gidy-auth-close"
+          type="button"
+          aria-label="Close"
+        >×</button>
 
         <h2 id="gidy-auth-title">Welcome Back</h2>
 
@@ -131,17 +157,23 @@
             required
           >
 
-          <button class="gidy-auth-submit" type="submit">
-            Sign In
-          </button>
+          <button
+            class="gidy-auth-submit"
+            type="submit"
+          >Sign In</button>
 
         </form>
 
-        <button class="gidy-auth-switch">
-          Create a new account
-        </button>
+        <button
+          class="gidy-auth-switch"
+          type="button"
+        >Create a new account</button>
 
-        <p class="gidy-auth-message" role="status"></p>
+        <p
+          class="gidy-auth-message"
+          role="status"
+          aria-live="polite"
+        ></p>
 
       </div>
     `;
@@ -149,31 +181,47 @@
     document.body.appendChild(overlay);
 
     const form = overlay.querySelector("#gidy-auth-form");
+    const emailInput = overlay.querySelector("#gidy-auth-email");
+    const passwordInput = overlay.querySelector("#gidy-auth-password");
     const message = overlay.querySelector(".gidy-auth-message");
     const title = overlay.querySelector("#gidy-auth-title");
     const submit = overlay.querySelector(".gidy-auth-submit");
     const switchButton = overlay.querySelector(".gidy-auth-switch");
 
+    function showMessage(text, isError = false) {
+      message.textContent = text;
+      message.classList.toggle("error", isError);
+    }
+
     function updateMode() {
       title.textContent =
-        mode === "login" ? "Welcome Back" : "Create Your Account";
+        mode === "login"
+          ? "Welcome Back"
+          : "Create Your Account";
 
       submit.textContent =
-        mode === "login" ? "Sign In" : "Create Account";
+        mode === "login"
+          ? "Sign In"
+          : "Create Account";
 
       switchButton.textContent =
         mode === "login"
           ? "Create a new account"
           : "Already have an account? Sign In";
 
-      overlay.querySelector("#gidy-auth-password").autocomplete =
-        mode === "login" ? "current-password" : "new-password";
+      passwordInput.autocomplete =
+        mode === "login"
+          ? "current-password"
+          : "new-password";
 
-      message.textContent = "";
+      showMessage("");
     }
 
     switchButton.addEventListener("click", () => {
+      if (submit.disabled) return;
+
       mode = mode === "login" ? "signup" : "login";
+
       updateMode();
     });
 
@@ -181,23 +229,37 @@
       .addEventListener("click", closeAuth);
 
     overlay.addEventListener("click", event => {
-      if (event.target === overlay) closeAuth();
+      if (event.target === overlay && !submit.disabled) {
+        closeAuth();
+      }
     });
 
     form.addEventListener("submit", async event => {
       event.preventDefault();
 
-      const email = overlay.querySelector("#gidy-auth-email").value.trim();
-      const password = overlay.querySelector("#gidy-auth-password").value;
+      if (submit.disabled) return;
+
+      if (!form.reportValidity()) return;
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const currentMode = mode;
 
       submit.disabled = true;
+      switchButton.disabled = true;
+
       submit.textContent = "Please wait...";
-      message.textContent = "";
+
+      showMessage(
+        currentMode === "signup"
+          ? "Creating your account..."
+          : "Signing you in..."
+      );
 
       try {
         let result;
 
-        if (mode === "signup") {
+        if (currentMode === "signup") {
           result = await supabase.auth.signUp({
             email,
             password
@@ -209,25 +271,48 @@
           });
         }
 
-        if (result.error) throw result.error;
+        if (result.error) {
+          throw result.error;
+        }
 
-        if (mode === "signup" && !result.data.session) {
-          message.textContent =
-            "Account created! Check your email to confirm your account.";
+        if (currentMode === "signup") {
+
+          if (!result.data.session) {
+            showMessage(
+              "Registration successful! Please check your email to verify your account."
+            );
+          } else {
+            showMessage("Account created successfully!");
+
+            setTimeout(() => {
+              closeAuth();
+            }, 1500);
+          }
+
         } else {
-          message.textContent =
-            mode === "signup"
-              ? "Account created successfully!"
-              : "Welcome back! Sign in successful.";
+          showMessage("Welcome back! Login successful.");
 
-          setTimeout(closeAuth, 1200);
+          setTimeout(() => {
+            closeAuth();
+          }, 1200);
         }
 
       } catch (error) {
-        message.textContent = error.message;
+        console.error("Gidy Connect authentication error:", error);
+
+        showMessage(
+          error.message || "Something went wrong. Please try again.",
+          true
+        );
+
       } finally {
         submit.disabled = false;
-        updateMode();
+        switchButton.disabled = false;
+
+        submit.textContent =
+          currentMode === "login"
+            ? "Sign In"
+            : "Create Account";
       }
     });
 
@@ -239,33 +324,47 @@
       overlay.remove();
       overlay = null;
     }
+
+    mode = "login";
   }
 
   async function updateProfileButton(session) {
-    if (!profileButton) return;
-
     profileButton.title = session
       ? "Signed in: " + session.user.email
       : "Sign in or create an account";
 
-    profileButton.setAttribute("aria-label", profileButton.title);
+    profileButton.setAttribute(
+      "aria-label",
+      profileButton.title
+    );
   }
 
-  profileButton?.addEventListener("click", async () => {
-    const session = await getSession();
+  profileButton.addEventListener("click", async () => {
+    try {
+      const session = await getSession();
 
-    if (session) {
-      const shouldSignOut = confirm(
-        "You are signed in. Do you want to sign out?"
-      );
+      if (session) {
+        const shouldSignOut = confirm(
+          "You are signed in. Do you want to sign out?"
+        );
 
-      if (shouldSignOut) {
-        const { error } = await supabase.auth.signOut();
+        if (shouldSignOut) {
+          const { error } = await supabase.auth.signOut();
 
-        if (error) alert(error.message);
+          if (error) throw error;
+
+          alert("You have signed out successfully.");
+
+          await updateProfileButton(null);
+        }
+
+      } else {
+        openAuth();
       }
-    } else {
-      openAuth();
+
+    } catch (error) {
+      console.error("Authentication session error:", error);
+      alert(error.message || "Unable to check your account.");
     }
   });
 
@@ -273,7 +372,12 @@
     updateProfileButton(session);
   });
 
-  getSession().then(updateProfileButton);
+  getSession()
+    .then(updateProfileButton)
+    .catch(error => {
+      console.error("Session initialization error:", error);
+    });
 
   console.log("Gidy Connect authentication initialized.");
+
 })();
