@@ -1,266 +1,308 @@
 
 /* =========================================
-   GIDY CONNECT — SOCIAL CONNECTION ENGINE
-   Version 2.0
+   GIDY CONNECT — NAVIGATION ENGINE
+   Version 3.0
 ========================================= */
 
-const platforms = [
-  { id: "facebook", name: "Facebook", icon: "f", color: "#1877F2" },
-  { id: "instagram", name: "Instagram", icon: "◎", color: "#E4408F" },
-  { id: "youtube", name: "YouTube", icon: "▶", color: "#FF0033" },
-  { id: "tiktok", name: "TikTok", icon: "♪", color: "#25F4EE" },
-  { id: "telegram", name: "Telegram", icon: "➤", color: "#29A9EB" },
-  { id: "whatsapp", name: "WhatsApp", icon: "◉", color: "#25D366" }
-];
+(() => {
+  "use strict";
 
-const platformLinks = {
-  facebook: "https://www.facebook.com/",
-  instagram: "https://www.instagram.com/",
-  youtube: "https://www.youtube.com/",
-  tiktok: "https://www.tiktok.com/",
-  telegram: "https://telegram.org/",
-  whatsapp: "https://www.whatsapp.com/"
-};
+  const main = document.getElementById("main-content");
+  const navItems = document.querySelectorAll(".nav-item");
 
-const socialContainer =
-  document.getElementById("social-platforms");
+  if (!main) return;
 
-const addButton =
-  document.getElementById("add-account");
+  const welcome = main.querySelector(".welcome-section");
+  const dashboard = main.querySelector(".dashboard-section");
+  const profileSection = main.querySelector(".profile-section");
 
-const profileButton =
-  document.getElementById("create-profile");
+  if (!welcome || !dashboard || !profileSection) {
+    console.error("Gidy Connect: Required sections missing.");
+    return;
+  }
 
-// CREATE CONNECTION WINDOW
+  // Create independent page containers
+  const homePage = document.createElement("section");
+  homePage.id = "home-page";
 
-function createConnectionWindow() {
-  const modal = document.createElement("div");
+  const connectPage = document.createElement("section");
+  connectPage.id = "connect-page";
 
-  modal.id = "connection-modal";
-  modal.className = "connection-modal";
+  const workspace = document.createElement("section");
+  workspace.id = "gidy-workspace";
 
-  modal.innerHTML = `
-    <div class="connection-dialog">
+  homePage.append(welcome, profileSection);
+  connectPage.appendChild(dashboard);
 
-      <button class="modal-close" aria-label="Close">
-        ×
-      </button>
+  main.append(homePage, connectPage, workspace);
 
-      <div class="modal-heading">
-        <span class="modal-eyebrow">GIDY CONNECT</span>
-        <h2>Connect Your Social World</h2>
+  // Workspace styling
+  const style = document.createElement("style");
+
+  style.textContent = `
+    #home-page,
+    #connect-page,
+    #gidy-workspace {
+      width: 100%;
+      animation: gidyPageIn .25s ease;
+    }
+
+    #connect-page,
+    #gidy-workspace {
+      display: none;
+      min-height: 70vh;
+      padding-top: 30px;
+      padding-bottom: 30px;
+    }
+
+    .gidy-page-heading {
+      margin-bottom: 25px;
+    }
+
+    .gidy-page-heading h1 {
+      font-size: 27px;
+      margin-bottom: 7px;
+    }
+
+    .gidy-page-heading p {
+      color: #969bb4;
+      font-size: 14px;
+    }
+
+    .gidy-workspace-card {
+      padding: 22px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(154,145,255,.2);
+      border-radius: 19px;
+      background: #111528;
+    }
+
+    .gidy-workspace-card h3 {
+      margin-bottom: 9px;
+    }
+
+    .gidy-workspace-card p {
+      color: #969bb4;
+      font-size: 14px;
+    }
+
+    .gidy-workspace-button {
+      margin-top: 16px;
+      padding: 12px 18px;
+      border: 1px solid #8178ff;
+      border-radius: 11px;
+      background: #222541;
+      color: white;
+      font-weight: 700;
+    }
+
+    .gidy-empty-state {
+      padding: 45px 20px;
+      text-align: center;
+      border: 1px solid rgba(154,145,255,.17);
+      border-radius: 19px;
+      background: #111528;
+    }
+
+    .gidy-empty-state .empty-icon {
+      font-size: 42px;
+      margin-bottom: 12px;
+    }
+
+    .gidy-empty-state p {
+      color: #969bb4;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    @keyframes gidyPageIn {
+      from {
+        opacity: 0;
+        transform: translateY(7px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  `;
+
+  document.head.appendChild(style);
+
+  // Switch between independent pages
+  function navigate(page) {
+
+    homePage.style.display = "none";
+    connectPage.style.display = "none";
+    workspace.style.display = "none";
+
+    navItems.forEach(item => {
+      item.classList.toggle(
+        "active",
+        item.dataset.page === page
+      );
+    });
+
+    if (page === "home") {
+      homePage.style.display = "block";
+    }
+
+    else if (page === "connections") {
+      connectPage.style.display = "block";
+    }
+
+    else {
+      workspace.style.display = "block";
+      renderWorkspace(page);
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  // Build workspace content
+  function renderWorkspace(page) {
+
+    workspace.innerHTML = "";
+
+    if (page === "inbox") {
+      workspace.innerHTML = `
+        <div class="gidy-page-heading">
+          <h1>Inbox</h1>
+          <p>Your conversations in one place.</p>
+        </div>
+
+        <div class="gidy-empty-state">
+          <div class="empty-icon">✉</div>
+          <h3>Your Messages</h3>
+          <p>
+            Your Gidy Connect conversations will
+            appear here.
+          </p>
+          <p>
+            Native messaging and supported external
+            integrations are coming in our next development phase.
+          </p>
+        </div>
+      `;
+    }
+
+    else if (page === "notifications") {
+      workspace.innerHTML = `
+        <div class="gidy-page-heading">
+          <h1>Activity</h1>
+          <p>Stay updated with your digital identity.</p>
+        </div>
+
+        <div class="gidy-empty-state">
+          <div class="empty-icon">♧</div>
+          <h3>No Activity Yet</h3>
+          <p>
+            New notifications and account activity
+            will appear here.
+          </p>
+        </div>
+      `;
+    }
+
+    else if (page === "profile") {
+      workspace.innerHTML = `
+        <div class="gidy-page-heading">
+          <h1>My Profile</h1>
+          <p>Manage your Gidy Connect identity.</p>
+        </div>
+
+        <div class="gidy-workspace-card">
+          <h3>Your Digital Identity</h3>
+          <p>
+            Create your personal profile and share
+            your social connections through one link.
+          </p>
+
+          <button
+            class="gidy-workspace-button"
+            id="workspace-create-profile"
+          >
+            Create Your Profile
+          </button>
+        </div>
+
+        <div class="gidy-workspace-card">
+          <h3>Account & Security</h3>
+          <p>
+            Manage your login and account security
+            using the account button at the top.
+          </p>
+        </div>
+      `;
+
+      document
+        .getElementById("workspace-create-profile")
+        ?.addEventListener("click", () => {
+          showProfileSetup();
+        });
+    }
+  }
+
+  // Profile creation entry point
+  function showProfileSetup() {
+    workspace.innerHTML = `
+      <div class="gidy-page-heading">
+        <h1>Create Your Profile</h1>
+        <p>Start building your digital identity.</p>
+      </div>
+
+      <div class="gidy-workspace-card">
+        <h3>Personal Profile</h3>
         <p>
-          Choose a platform to explore its connection options.
+          Your profile setup will include your name,
+          username, profile photo, biography,
+          social links and privacy settings.
+        </p>
+        <p style="margin-top:12px">
+          The next development step will connect
+          this profile to your Supabase database.
         </p>
       </div>
 
-      <input
-        type="search"
-        id="platform-search"
-        class="platform-search"
-        placeholder="Search social platforms..."
-        aria-label="Search social platforms"
+      <button
+        class="gidy-workspace-button"
+        id="back-to-profile"
       >
+        Back to Profile
+      </button>
+    `;
 
-      <div id="modal-platform-grid" class="modal-platform-grid"></div>
-
-      <div id="platform-details" class="platform-details" hidden></div>
-
-      <p class="modal-security">
-        <span>🛡️</span>
-        Your social passwords are never requested by Gidy Connect.
-      </p>
-
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-
-  modal.querySelector(".modal-close").addEventListener("click", closeModal);
-
-  modal.addEventListener("click", event => {
-    if (event.target === modal) closeModal();
-  });
-
-  document.addEventListener("keydown", handleEscape);
-
-  function handleEscape(event) {
-    if (event.key === "Escape") closeModal();
-  }
-
-  function closeModal() {
-    modal.remove();
-    document.removeEventListener("keydown", handleEscape);
-  }
-
-  return modal;
-}
-
-// SHOW CONNECTION WINDOW
-
-function openConnectionWindow() {
-  if (document.getElementById("connection-modal")) return;
-
-  const modal = createConnectionWindow();
-
-  const grid = modal.querySelector("#modal-platform-grid");
-  const search = modal.querySelector("#platform-search");
-  const details = modal.querySelector("#platform-details");
-
-  function renderChoices(query = "") {
-    grid.innerHTML = "";
-
-    const filtered = platforms.filter(platform =>
-      platform.name.toLowerCase().includes(query.toLowerCase())
-    );
-
-    filtered.forEach(platform => {
-      const card = document.createElement("button");
-
-      card.type = "button";
-      card.className = "modal-platform-card";
-
-      const icon = document.createElement("span");
-      icon.className = "modal-platform-icon";
-      icon.style.color = platform.color;
-      icon.textContent = platform.icon;
-
-      const name = document.createElement("strong");
-      name.textContent = platform.name;
-
-      const status = document.createElement("small");
-      status.textContent = "Not connected";
-
-      card.append(icon, name, status);
-
-      card.addEventListener("click", () => {
-        showPlatformDetails(platform);
+    document
+      .getElementById("back-to-profile")
+      ?.addEventListener("click", () => {
+        renderWorkspace("profile");
       });
 
-      grid.appendChild(card);
-    });
-
-    if (!filtered.length) {
-      const message = document.createElement("p");
-      message.className = "no-platforms";
-      message.textContent = "No matching platforms found.";
-      grid.appendChild(message);
-    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function showPlatformDetails(platform) {
-    details.hidden = false;
-    details.innerHTML = "";
-
-    const title = document.createElement("h3");
-    title.textContent = "Connect " + platform.name;
-
-    const description = document.createElement("p");
-    description.textContent =
-      "Continue to the official " + platform.name +
-      " website to access your account. Official account authorization " +
-      "will be implemented in a later development phase.";
-
-    const connect = document.createElement("button");
-    connect.className = "official-connect-button";
-    connect.textContent = "Open " + platform.name;
-
-    connect.addEventListener("click", () => {
-      window.open(
-        platformLinks[platform.id],
-        "_blank",
-        "noopener,noreferrer"
-      );
+  // Bottom navigation events
+  navItems.forEach(item => {
+    item.addEventListener("click", () => {
+      navigate(item.dataset.page);
     });
-
-    const back = document.createElement("button");
-    back.className = "back-connect-button";
-    back.textContent = "Choose another platform";
-
-    back.addEventListener("click", () => {
-      details.hidden = true;
-      details.innerHTML = "";
-    });
-
-    details.append(title, description, connect, back);
-
-    details.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest"
-    });
-  }
-
-  search.addEventListener("input", () => {
-    renderChoices(search.value);
   });
 
-  renderChoices();
-}
+  // Create Your Profile button on Home
+  const createProfileButton =
+    document.getElementById("create-profile");
 
-// MAIN SOCIAL PLATFORM CARDS
-
-function renderPlatforms() {
-  socialContainer.innerHTML = "";
-
-  platforms.forEach(platform => {
-    const card = document.createElement("button");
-
-    card.className = "social-card";
-    card.type = "button";
-
-    const icon = document.createElement("span");
-    icon.className = "social-icon";
-    icon.style.color = platform.color;
-    icon.textContent = platform.icon;
-
-    const name = document.createElement("h3");
-    name.textContent = platform.name;
-
-    const description = document.createElement("p");
-    description.textContent = "Not connected";
-
-    card.append(icon, name, description);
-
-    card.addEventListener("click", () => {
-      openConnectionWindow();
-    });
-
-    socialContainer.appendChild(card);
+  createProfileButton?.addEventListener("click", () => {
+    navigate("profile");
+    showProfileSetup();
   });
-}
 
-// BUTTON EVENTS
+  // Initial page
+  navigate("home");
 
-addButton.addEventListener("click", openConnectionWindow);
+  console.log("Gidy Connect navigation v3.0 initialized.");
 
-profileButton.addEventListener("click", () => {
-  alert("Personal profile development is coming soon.");
-});
-
-// NAVIGATION
-
-document.querySelectorAll(".nav-item").forEach(item => {
-  item.addEventListener("click", () => {
-    document.querySelectorAll(".nav-item").forEach(nav => {
-      nav.classList.remove("active");
-    });
-
-    item.classList.add("active");
-
-    const page = item.dataset.page;
-
-    if (page !== "home") {
-      alert(
-        page.charAt(0).toUpperCase() +
-        page.slice(1) +
-        " page is under development."
-      );
-    }
-  });
-});
-
-// INITIALIZE
-
-renderPlatforms();
-
-console.log("Gidy Connect v2.0 initialized.");
+})();
