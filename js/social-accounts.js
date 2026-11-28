@@ -1,7 +1,7 @@
 
 /* =========================================
    GIDY CONNECT — SOCIAL ACCOUNT MANAGER
-   Add • Edit • Delete • Visibility
+   App Icons • Open Apps • Add • Edit • Delete
 ========================================= */
 
 (() => {
@@ -16,6 +16,61 @@
     console.error("Social account manager initialization failed.");
     return;
   }
+
+  const platforms = {
+    Facebook: {
+      slug: "facebook",
+      color: "#1877F2",
+      package: "com.facebook.katana"
+    },
+    Instagram: {
+      slug: "instagram",
+      color: "#C13584",
+      package: "com.instagram.android"
+    },
+    YouTube: {
+      slug: "youtube",
+      color: "#FF0033",
+      package: "com.google.android.youtube"
+    },
+    TikTok: {
+      slug: "tiktok",
+      color: "#111111",
+      package: "com.zhiliaoapp.musically"
+    },
+    Telegram: {
+      slug: "telegram",
+      color: "#229ED9",
+      package: "org.telegram.messenger"
+    },
+    WhatsApp: {
+      slug: "whatsapp",
+      color: "#25D366",
+      package: "com.whatsapp"
+    },
+    X: {
+      slug: "x",
+      color: "#111111",
+      package: "com.twitter.android"
+    },
+    LinkedIn: {
+      slug: "linkedin",
+      color: "#0A66C2",
+      package: "com.linkedin.android"
+    },
+    Snapchat: {
+      slug: "snapchat",
+      color: "#FFFC00",
+      package: "com.snapchat.android"
+    }
+  };
+
+  const platformNames = [
+    ...Object.keys(platforms),
+    "Other"
+  ];
+
+  let accounts = [];
 
   const style = document.createElement("style");
 
@@ -44,7 +99,8 @@
 
     .sa-box h2 { margin-bottom: 15px; }
 
-    .sa-box input, .sa-box select {
+    .sa-box input:not([type="checkbox"]),
+    .sa-box select {
       display: block;
       width: 100%;
       padding: 13px;
@@ -63,7 +119,8 @@
       margin-top: 12px;
     }
 
-    .sa-actions button, .sa-submit {
+    .sa-actions button,
+    .sa-submit {
       padding: 10px 14px;
       border: 0;
       border-radius: 9px;
@@ -84,35 +141,73 @@
       min-width: 0;
     }
 
-    .sa-card strong { display: block; margin-bottom: 5px; }
-    .sa-card a {
-      display: block;
-      color: #65eee4;
-      font-size: 12px;
-      overflow-wrap: anywhere;
-      margin-bottom: 12px;
+    .sa-card-head {
+      display: flex;
+      align-items: center;
+      gap: 15px;
     }
 
-    .sa-card small { color: #a6abc0; }
-    .sa-message { color: #65eee4; font-size: 13px; }
+    .sa-app-icon {
+      width: 62px;
+      height: 62px;
+      min-width: 62px;
+      border-radius: 17px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      text-decoration: none;
+      box-shadow: 0 5px 18px rgba(0,0,0,.25);
+    }
+
+    .sa-app-icon img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+    }
+
+    .sa-icon-fallback {
+      color: white;
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .sa-account-info {
+      min-width: 0;
+    }
+
+    .sa-account-info strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 5px;
+    }
+
+    .sa-handle {
+      color: #65eee4;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .sa-open-label {
+      display: inline-block;
+      margin-top: 5px;
+      color: #a6abc0;
+      font-size: 12px;
+      text-decoration: none;
+    }
+
+    .sa-card small {
+      display: block;
+      color: #a6abc0;
+      margin-top: 15px;
+    }
+
+    .sa-message {
+      color: #65eee4;
+      font-size: 13px;
+    }
   `;
 
   document.head.appendChild(style);
-
-  const platformNames = [
-    "Facebook",
-    "Instagram",
-    "YouTube",
-    "TikTok",
-    "Telegram",
-    "WhatsApp",
-    "X",
-    "LinkedIn",
-    "Snapchat",
-    "Other"
-  ];
-
-  let accounts = [];
 
   function showMessage(message) {
     alert(message);
@@ -129,6 +224,52 @@
     document.querySelector(".sa-modal")?.remove();
   }
 
+  // Extract a readable account name without showing the full URL.
+  function getAccountLabel(account) {
+    try {
+      const url = new URL(account.account_url);
+      const parts = url.pathname.split("/").filter(Boolean);
+
+      if (account.platform === "Instagram" && parts[0]) {
+        return "@" + parts[0].replace(/^@/, "");
+      }
+
+      if (account.platform === "TikTok" && parts[0]) {
+        return parts[0].startsWith("@")
+          ? parts[0]
+          : "@" + parts[0];
+      }
+
+      if (parts[0]) {
+        return parts[0].length > 32
+          ? parts[0].slice(0, 29) + "..."
+          : parts[0];
+      }
+
+      return "View profile";
+    } catch {
+      return "View profile";
+    }
+  }
+
+  // Android opens the installed app when possible.
+  // If it is not installed, Android opens the website.
+  function getAppLink(account) {
+    const originalUrl = new URL(account.account_url);
+    const info = platforms[account.platform];
+
+    if (!info) return originalUrl.href;
+
+    const cleanPath = originalUrl.pathname || "/";
+    const fallback = encodeURIComponent(originalUrl.href);
+
+    return (
+      `intent://${originalUrl.host}${cleanPath}` +
+      `#Intent;scheme=https;package=${info.package};` +
+      `S.browser_fallback_url=${fallback};end`
+    );
+  }
+
   function openForm(account = null) {
     closeModal();
 
@@ -140,6 +281,12 @@
         account?.platform === name ? "selected" : ""
       }>${name}</option>`
     ).join("");
+
+    const safeUrl = account
+      ? account.account_url
+          .replace(/&/g, "&amp;")
+          .replace(/"/g, "&quot;")
+      : "";
 
     modal.innerHTML = `
       <form class="sa-box">
@@ -153,7 +300,7 @@
           id="sa-url"
           type="url"
           placeholder="https://..."
-          value="${account ? account.account_url.replace(/&/g, "&amp;").replace(/"/g, "&quot;") : ""}"
+          value="${safeUrl}"
           required
         >
 
@@ -240,8 +387,9 @@
         await loadAccounts();
 
         showMessage(
-          account ? "Account updated successfully!" :
-          "Account added successfully!"
+          account
+            ? "Account updated successfully!"
+            : "Account added successfully!"
         );
 
       } catch (error) {
@@ -252,7 +400,7 @@
     });
   }
 
-  async function editAccount(id) {
+  function editAccount(id) {
     const account = accounts.find(item => item.id === id);
     if (account) openForm(account);
   }
@@ -309,27 +457,73 @@
     container.innerHTML = "";
 
     if (count) {
-      count.textContent =
-        `${accounts.length} Connected`;
+      count.textContent = `${accounts.length} Connected`;
     }
 
     accounts.forEach(account => {
       const card = document.createElement("div");
       card.className = "sa-card";
 
+      const head = document.createElement("div");
+      head.className = "sa-card-head";
+
+      const info = platforms[account.platform];
+
+      const appLink = document.createElement("a");
+      appLink.className = "sa-app-icon";
+      appLink.href = getAppLink(account);
+      appLink.target = "_blank";
+      appLink.rel = "noopener noreferrer";
+      appLink.title = `Open ${account.platform}`;
+      appLink.setAttribute(
+        "aria-label",
+        `Open ${account.platform} profile`
+      );
+
+      const background = info ? info.color : "#34345e";
+      appLink.style.background = background;
+
+      if (info) {
+        const logo = document.createElement("img");
+        logo.src = `https://cdn.simpleicons.org/${info.slug}/ffffff`;
+        logo.alt = "";
+        logo.onerror = () => {
+          logo.remove();
+          const fallback = document.createElement("span");
+          fallback.className = "sa-icon-fallback";
+          fallback.textContent = account.platform.charAt(0);
+          appLink.appendChild(fallback);
+        };
+        appLink.appendChild(logo);
+      } else {
+        const fallback = document.createElement("span");
+        fallback.className = "sa-icon-fallback";
+        fallback.textContent = "G";
+        appLink.appendChild(fallback);
+      }
+
+      const accountInfo = document.createElement("div");
+      accountInfo.className = "sa-account-info";
+
       const title = document.createElement("strong");
       title.textContent = account.platform;
 
-      const link = document.createElement("a");
-      link.href = account.account_url;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.textContent = account.account_url;
+      const handle = document.createElement("div");
+      handle.className = "sa-handle";
+      handle.textContent = getAccountLabel(account);
+
+      const openText = document.createElement("a");
+      openText.className = "sa-open-label";
+      openText.href = getAppLink(account);
+      openText.target = "_blank";
+      openText.rel = "noopener noreferrer";
+      openText.textContent = `Open ${account.platform}`;
+
+      accountInfo.append(title, handle, openText);
+      head.append(appLink, accountInfo);
 
       const status = document.createElement("small");
-      status.textContent = account.is_visible
-        ? "Public"
-        : "Private";
+      status.textContent = account.is_visible ? "Public" : "Private";
 
       const actions = document.createElement("div");
       actions.className = "sa-actions";
@@ -352,7 +546,7 @@
       remove.onclick = () => deleteAccount(account.id);
 
       actions.append(visibility, edit, remove);
-      card.append(title, link, status, actions);
+      card.append(head, status, actions);
       container.appendChild(card);
     });
 
@@ -390,7 +584,7 @@
     }
   }
 
-  // Replace the old Add button action.
+  // Prevent the old Add button action from running.
   addButton.addEventListener("click", event => {
     event.preventDefault();
     event.stopImmediatePropagation();
