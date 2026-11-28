@@ -1,6 +1,5 @@
 
-const CACHE_NAME = "gidy-connect-v1";
-
+const CACHE_NAME = "gidy-connect-v2";
 const APP_FILES = [
   "./",
   "./index.html",
